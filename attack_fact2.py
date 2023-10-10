@@ -30,5 +30,7 @@ k0_guess_03FF = max(set(xor_values_03FF), key=xor_values_03FF.count)
 # Find the most frequent value in the XOR values for (k[0] + k[1]) (iv=04 FF x)
 k0_k1_guess_04FF = max(set(xor_values_04FF), key=xor_values_04FF.count)
 
+k1_guess =  k0_guess_03FF - k0_k1_guess_04FF
 print("Guess for k[0] (iv=03 FF x):", hex(k0_guess_03FF))
 print("Guess for (k[0] + k[1]) (iv=04 FF x):", hex(k0_k1_guess_04FF))
+print("Guess for k[1]:", hex(k1_guess))
