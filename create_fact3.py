@@ -24,8 +24,8 @@ def calculate_di(i):
 
 def main():
     # Long-term key (13 bytes)
-    long_term_key = os.urandom(13)
-    
+    long_term_key = bytes.fromhex("045cc693dc5f1332460ef31d9c")
+    message = bytes([0xda])
     # Define the range of z values based on the requirement
     z_values = range(5, 15)
     
@@ -43,9 +43,10 @@ def main():
                 
                 # Construct the IV based on the description
                 iv = bytes([z]) + b'\xFF' + bytes([x])
+                print(iv)
                 
                 # Encrypt plaintext with IV + long-term key for iv=z FF x
-                encrypted_data = rc4(iv + long_term_key, bytes([value_z_FF_x]))
+                encrypted_data = rc4(iv + long_term_key, message)
                 
                 # Write the IV and corresponding encrypted value to the result file
                 result_file.write(f"0X{iv.hex().upper()} 0X{encrypted_data.hex().upper()}\n")

@@ -1,69 +1,34 @@
-import os
+# Read the ciphertext data from the file for iv=03 FF x (results_03FF.txt)
+ciphertext_data_03FF = []
 
-# RC4 implementation for both encryption and decryption
-def rc4(key, data):
-    S = list(range(256))
-    j = 0
-    key = bytearray(key)
-    data = bytearray(data)
-    
-    # Key-scheduling algorithm
-    for i in range(256):
-        j = (j + S[i] + key[i % len(key)]) % 256
-        S[i], S[j] = S[j], S[i]
-    
-    j = 0
-    output = bytearray()
-    
-    # Pseudo-random generation algorithm
-    for char in data:
-        i = (i + 1) % 256
-        j = (j + S[i]) % 256
-        S[i], S[j] = S[j], S[i]
-        k = S[(S[i] + S[j]) % 256]
-        output_byte = char ^ k
-        output.append(output_byte)
-    
-    return bytes(output)
+with open("results_03FF.txt", "r") as file:
+    for line in file:
+        parts = line.strip().split()
+        if len(parts) == 2:
+            encrypted_value = int(parts[1], 16)
+            ciphertext_data_03FF.append(encrypted_value)
 
-# Read the data from res.txt
-with open('files/res.txt', 'r') as file:
-    lines = file.readlines()
+# Read the ciphertext data from the file for iv=04 FF x (results_04FF.txt)
+ciphertext_data_04FF = []
 
-# Initialize a list to store IV-ciphertext pairs
-iv_ciphertext_pairs = []
+with open("results_04FF.txt", "r") as file:
+    for line in file:
+        parts = line.strip().split()
+        if len(parts) == 2:
+            encrypted_value = int(parts[1], 16)
+            ciphertext_data_04FF.append(encrypted_value)
 
-# Extract IVs and ciphertexts from the file
-for line in lines:
-    parts = line.split()
-    iv_hex = parts[0][2:]  # Remove the "0X" prefix and use the rest of the string as IV
-    ciphertext = int(parts[1], 16)
-    iv_ciphertext_pairs.append((iv_hex, ciphertext))
+# Calculate the XOR values for (c[0] XOR m[0]) - x - 6 for iv=03 FF x
+xor_values_03FF = [(ciphertext ^ (x + 6)) for x, ciphertext in enumerate(ciphertext_data_03FF)]
 
-# Initialize an empty key
-key_guess = bytes([0] * 13)
+# Calculate the XOR values for (c[0] XOR m[0]) - x - 10 - k[0] - k[1] for iv=04 FF x
+xor_values_04FF = [(ciphertext ^ (x + 10)) for x, ciphertext in enumerate(ciphertext_data_04FF)]
 
-# Brute force all 13 bytes of the key
-for byte_index in range(13):
-    for key_byte_guess in range(256):
-        key_guess = key_guess[:byte_index] + bytes([key_byte_guess]) + key_guess[byte_index + 1:]
-        
-        # Check if this key successfully decrypts all ciphertexts
-        successful_decryptions = 0
-        for iv_hex, ciphertext in iv_ciphertext_pairs:
-            iv = bytes.fromhex(iv_hex)
-            decrypted = rc4(iv + key_guess, bytes([ciphertext]))
-            if decrypted[0] == key_byte_guess:
-                successful_decryptions += 1
-            else:
-                break  # Break if any decryption fails
-        
-        # If all ciphertexts were successfully decrypted with this byte of the key, update the key guess
-        if successful_decryptions == len(iv_ciphertext_pairs):
-            print(f"Successful byte {byte_index} guess: {key_byte_guess}")
-        else:
-            # If any decryption fails, reset the key_guess for the next attempt
-            key_guess = bytes([0] * 13)
+# Find the most frequent value in the XOR values for k[0] (iv=03 FF x)
+k0_guess_03FF = max(set(xor_values_03FF), key=xor_values_03FF.count)
 
-# Print the final key
-print(f"Brute-force attack completed. Key: {key_guess.hex().upper()}")
+# Find the most frequent value in the XOR values for (k[0] + k[1]) (iv=04 FF x)
+k0_k1_guess_04FF = max(set(xor_values_04FF), key=xor_values_04FF.count)
+
+print("Guess for k[0] (iv=03 FF x):", hex(k0_guess_03FF))
+print("Guess for (k[0] + k[1]) (iv=04 FF x):", hex(k0_k1_guess_04FF))

@@ -26,19 +26,17 @@ def calculate_di(i):
 
 def main():
     # Long-term key (13 bytes)
-    long_term_key = os.urandom(13)
-    
+    long_term_key = bytes.fromhex("045cc693dc5f1332460ef31d9c")
+    message = bytes([0xda])
+    print(message)
     # Create result files to store IVs and encrypted values
     with open("results_03FF.txt", "w") as result_file_03FF, open("results_04FF.txt", "w") as result_file_04FF:
         for x in range(256):
             # Construct the IV for iv=03 FF x
             iv_03FF = bytes([0x03, 0xFF, x])
             
-            # Calculate the value to be encrypted for iv=03 FF x and ensure it's within the valid byte range
-            value_03FF = (x + 6 + long_term_key[0]) % 256
-            
             # Encrypt plaintext with IV + long-term key for iv=03 FF x
-            encrypted_data_03FF = rc4(iv_03FF + long_term_key, bytes([value_03FF]))
+            encrypted_data_03FF = rc4(iv_03FF + long_term_key, message)
             
             # Write the IV and corresponding encrypted value to the results file for iv=03 FF x
             result_file_03FF.write(f"0X{iv_03FF.hex().upper()} 0X{encrypted_data_03FF.hex().upper()}\n")
@@ -46,11 +44,8 @@ def main():
             # Construct the IV for iv=04 FF x
             iv_04FF = bytes([0x04, 0xFF, x])
             
-            # Calculate the value to be encrypted for iv=04 FF x and ensure it's within the valid byte range
-            value_04FF = (x + 10 + long_term_key[0] + long_term_key[1]) % 256
-            
             # Encrypt plaintext with IV + long-term key for iv=04 FF x
-            encrypted_data_04FF = rc4(iv_04FF + long_term_key, bytes([value_04FF]))
+            encrypted_data_04FF = rc4(iv_04FF + long_term_key, message)
             
             # Write the IV and corresponding encrypted value to the results file for iv=04 FF x
             result_file_04FF.write(f"0X{iv_04FF.hex().upper()} 0X{encrypted_data_04FF.hex().upper()}\n")

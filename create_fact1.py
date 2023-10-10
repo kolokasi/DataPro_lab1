@@ -10,6 +10,7 @@ def rc4(key, plaintext):
     i = j = 0
     ciphertext = []
     for char in plaintext:
+
         i = (i + 1) % 256
         j = (j + S[i]) % 256
         S[i], S[j] = S[j], S[i]
@@ -25,7 +26,13 @@ def calculate_di(i):
 def main():
     # Long-term key (13 bytes)
     long_term_key = os.urandom(13)
-    
+    long_term_key_hex=long_term_key.hex()
+    print(long_term_key_hex)
+
+    message = os.urandom(1)
+    message_hex=message.hex()
+    print(message_hex)
+
     # Create a result file to store IVs and encrypted values
     with open("res_01FFx.txt", "w") as result_file:
         for x in range(256):
@@ -33,7 +40,7 @@ def main():
             iv = bytes([0x01, 0xFF, x])
             
             # Encrypt plaintext with IV + long-term key
-            encrypted_data = rc4(iv + long_term_key, bytes([(x + 2) % 256]))
+            encrypted_data = rc4(iv + long_term_key, message)
             
             # Write the IV and corresponding encrypted value to the results file
             result_file.write(f"0X{iv.hex().upper()} 0X{encrypted_data.hex().upper()}\n")
