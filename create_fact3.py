@@ -26,8 +26,9 @@ def main():
     # Long-term key (13 bytes)
     long_term_key = bytes.fromhex("045cc693dc5f1332460ef31d9c")
     message = bytes([0xda])
+    
     # Define the range of z values based on the requirement
-    z_values = range(5, 15)
+    z_values = range(5, 16)  # 5 to 15, inclusive
     
     for z in z_values:
         # Create a result file for each IV
@@ -43,7 +44,6 @@ def main():
                 
                 # Construct the IV based on the description
                 iv = bytes([z]) + b'\xFF' + bytes([x])
-                print(iv)
                 
                 # Encrypt plaintext with IV + long-term key for iv=z FF x
                 encrypted_data = rc4(iv + long_term_key, message)
