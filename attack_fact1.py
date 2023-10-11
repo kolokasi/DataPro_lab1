@@ -9,7 +9,7 @@ with open("res_01FFx.txt", "r") as file:
             ciphertext_data.append(encrypted_value)
 
 # Calculate the XOR values for c[0] XOR (x+2)
-xor_values = [(ciphertext ^ (x + 2)) for x, ciphertext in enumerate(ciphertext_data)]
+xor_values = [(ciphertext ^ (x + 2)) % 256 for x, ciphertext in enumerate(ciphertext_data)]
 
 # Find the most frequent value in the XOR values
 most_frequent_value = max(set(xor_values), key=xor_values.count)
